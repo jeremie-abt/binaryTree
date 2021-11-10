@@ -1,0 +1,126 @@
+package second_tree
+
+import (
+	"fmt"
+	"testing"
+)
+import "reflect"
+
+import "gotest.tools/assert"
+
+/*
+Idee : voir comment gerer l'indexation
+-> par ex, plusieurs fonctions d'index (une alphebetique etc ..)
+
+Interface de tree :
+Newtree(...interface{}) instancier un nouveau avec autant d'elem que voulu
+Insert (...interface {}) -> pouvoir inserer un element
+Delete (...interface {}) -> delete une value.
+AddTriFunc (func(interface{}, interface{}))
+
+
+// -> je l'ajoute apres ? OK
+
+
+AsList() Tree
+
+TODO A reflechir sur le nom
+TreeConsumer
+GetChanConsumption -> chanel qui va iterer sur le contenu de notre arbre
+GetAsList -> get notre arbre en tant que list
+GetAsSlice -> avoir un slice
+
+ */
+
+func TestNewTreeInterface(t *testing.T) {
+	firstTree, err1 := NewTree("test", "test2", "test3")
+	secTree, err2 := NewTree([]string{"test", "test2", "test3"})
+	thirdTree, err3 := NewTree("test", "test2")
+	fourthTree, err4 := NewTree(6, 13, 15, 4, 2)
+	fifthTree, err5 := NewTree(6, 15, 13, 2, 4)
+
+	assert.DeepEqual(t, firstTree, secTree)
+	assert.Check(t, !reflect.DeepEqual(firstTree, thirdTree))
+	assert.DeepEqual(t, fourthTree, fifthTree)
+	assert.NilError(t, err1)
+	assert.NilError(t, err2)
+	assert.NilError(t, err3)
+	assert.NilError(t, err4)
+	assert.NilError(t, err5)
+}
+
+
+// linked to TestEnforceTyping function.
+type firstCustomType struct {
+	value int
+}
+// linked to TestEnforceTyping function.
+type secondCustomType struct {
+	value int
+}
+type interfaceTest interface{}
+func TestEnforceTyping(t *testing.T) {
+	// Values for a binary tree can be of all types but each bt can hold
+	// only one type, you can't add a string and after an int for ex.
+
+	_, err := NewTree("test", "test2", 5)
+	assert.Error(t, err, "tree can't hold different type of data")
+
+	_, err = NewTree(interfaceTest(firstCustomType{value: 5}), interfaceTest(secondCustomType{value: 5}))
+	assert.Check(t, err, "tree can't hold different type of data")
+
+	// tree must accept interface values with same concrete type
+	_, err = NewTree(interfaceTest(firstCustomType{value: 6}), interfaceTest(firstCustomType{value: 5}))
+	assert.NilError(t, err)
+}
+
+func TestInsert(t *testing.T) {
+
+	treeConstructViaInsert, _ := NewTree()
+	err := treeConstructViaInsert.Insert(8, 9)
+	assert.NilError(t, err)
+	err = treeConstructViaInsert.Insert(15, 2)
+	assert.NilError(t, err)
+	err = treeConstructViaInsert.Insert(2, 25)
+	assert.NilError(t, err)
+
+	treeConstructViaConstructor, err := NewTree(8, 9, 15, 2, 2, 25)
+	assert.NilError(t, err)
+	assert.DeepEqual(t, treeConstructViaConstructor, treeConstructViaInsert)
+
+	err = treeConstructViaInsert.Insert("bad date type")
+	assert.Error(t, err, "tree can't hold different type of data")
+}
+
+func TestDelete(t *testing.T) {
+
+	testedTree, err := NewTree(8, 9, 15, 2, 2, 25)
+	treeWithValueDeleted, err1 := NewTree(8, 9, 2, 25)
+	assert.NilError(t, err)
+	assert.NilError(t, err1)
+
+	err = testedTree.Delete(15, 2)
+	assert.NilError(t, err)
+	assert.DeepEqual(t, testedTree, treeWithValueDeleted)
+
+	err = testedTree.Delete(1568)
+	assert.Error(t, err, "value doest not exist in this tree")
+	err = testedTree.Delete("bad data type")
+	assert.Error(t, err, "tree can't hold different type of data")
+}
+
+func TestGetAsList(t *testing.T) {
+	testedTree, _ := NewTree(8,5,6,9,78,45,6)
+
+	assert.DeepEqual(t, []int{5, 6, 6, 8, 9, 45, 78}, testedTree.GetAsList())
+	testedTree.AddTriFunc(func(first interface{}, sec interface{}) int {
+		// this func should return 1 if the first element is inferiorto the second,
+		// 0 otherwise
+		if first.(int) > sec.(int) {
+			// I want to sort it decreasingly, so the cond is reversed.
+			return 1
+		}
+		return 0
+	})
+	assert.DeepEqual(t, []int{78, 45, 9, 8, 6, 6, 5}, testedTree.GetAsList())
+}
