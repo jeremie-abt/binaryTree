@@ -8,29 +8,6 @@ import "reflect"
 
 import "gotest.tools/assert"
 
-/*
-Idee : voir comment gerer l'indexation
--> par ex, plusieurs fonctions d'index (une alphebetique etc ..)
-
-Interface de tree :
-Newtree(...interface{}) instancier un nouveau avec autant d'elem que voulu
-Insert (...interface {}) -> pouvoir inserer un element
-Delete (...interface {}) -> delete une value.
-AddTriFunc (func(interface{}, interface{}))
-
-
-// -> je l'ajoute apres ? OK
-
-
-AsList() Tree
-
-TODO A reflechir sur le nom
-TreeConsumer
-GetChanConsumption -> chanel qui va iterer sur le contenu de notre arbre
-GetAsList -> get notre arbre en tant que list
-GetAsSlice -> avoir un slice
-
- */
 
 func TestNewTreeInterface(t *testing.T) {
 	firstTree, err1 := NewTree("test", "test2", "test3")
@@ -58,10 +35,11 @@ type firstCustomType struct {
 type secondCustomType struct {
 	value int
 }
+// linked to TestEnforceTyping function.
 type interfaceTest interface{}
 func TestEnforceTyping(t *testing.T) {
-	// Values for a binary tree can be of all types but each bt can hold
-	// only one type, you can't add a string and after an int for ex.
+	// Values for a binary tree can be of different types.
+	// This test verify that statement hold true.
 
 	_, err := NewTree("test", "test2", 5)
 	assert.Error(t, err, "tree can't hold different type of data")
@@ -72,6 +50,12 @@ func TestEnforceTyping(t *testing.T) {
 	// tree must accept interface values with same concrete type
 	_, err = NewTree(interfaceTest(firstCustomType{value: 6}), interfaceTest(firstCustomType{value: 5}))
 	assert.NilError(t, err)
+
+	testedTree, _ := NewTree()
+	err = testedTree.Insert(5, 4)
+	assert.NilError(t, err)
+	err = testedTree.Insert("bad string data type")
+	assert.Error(t, err, "tree can't hold different type of data")
 }
 
 func TestInsert(t *testing.T) {
@@ -114,7 +98,7 @@ func TestGetAsList(t *testing.T) {
 
 	assert.DeepEqual(t, []int{5, 6, 6, 8, 9, 45, 78}, testedTree.GetAsList())
 	testedTree.AddTriFunc(func(first interface{}, sec interface{}) int {
-		// this func should return 1 if the first element is inferiorto the second,
+		// this func should return 1 if the first element is inferior to the second,
 		// 0 otherwise
 		if first.(int) > sec.(int) {
 			// I want to sort it decreasingly, so the cond is reversed.
