@@ -6,19 +6,8 @@ import (
 	"testing"
 )
 
-/*
-Test for public interface
-TODO: Change
-*/
-
 func TestInsertNode(t *testing.T) {
-	tr, _ := NewTree(func(first interface{}, sec interface{}) bool {
-
-		if first.(int) < sec.(int) {
-			return false
-		}
-		return true
-	})
+	tr, _ := NewTree(intComparisonFunc)
 	assert.Assert(t, cmp.Nil(tr.rootNode))
 
 	tr.insert(8)
@@ -43,9 +32,9 @@ func TestInsertSpecificFunc(t *testing.T) {
 	tr, _ := NewTree(func(first interface{}, sec interface{}) bool {
 
 		if len(first.(string)) < len(sec.(string)) {
-			return false
+			return true
 		}
-		return true
+		return false
 	})
 	assert.Assert(t, cmp.Nil(tr.rootNode))
 
@@ -64,6 +53,119 @@ func TestInsertSpecificFunc(t *testing.T) {
 	assert.Assert(t, tr.rootNode.right.right.value.(string) == "salut a tous les amis")
 	assert.Assert(t, tr.rootNode.right.right.right.value.(string) == "salut salut a tous les ami")
 	assert.Assert(t, tr.rootNode.left.left.value.(string) == "s")
+}
+
+func TestDeleteLeaf(t *testing.T) {
+	/*
+						8
+					   / \
+	                  2   12
+	                 / \    \
+	                1   3    15
+	                           \
+	                            19
+	 */
+	tr, _ := NewTree(intComparisonFunc)
+	assert.Assert(t, cmp.Nil(tr.rootNode))
+
+	tr.insert(8)
+	tr.insert(12)
+	tr.insert(2)
+	tr.insert(3)
+	tr.insert(15)
+	tr.insert(19)
+	tr.insert(1)
+
+	tr.delete(1)
+	tr.delete(3)
+	tr.delete(19)
+	assert.Assert(t, cmp.Nil(tr.rootNode.left.left))
+	assert.Assert(t, cmp.Nil(tr.rootNode.left.right))
+	assert.Assert(t, cmp.Nil(tr.rootNode.right.right.right))
+
+	tr.delete(15)
+	tr.delete(2)
+	assert.Assert(t, cmp.Nil(tr.rootNode.right.right))
+	assert.Assert(t, cmp.Nil(tr.rootNode.left))
+
+	tr.delete(12)
+	assert.Assert(t, cmp.Nil(tr.rootNode.right))
+}
+
+func TestDeleteRoot(t *testing.T){
+	tr, _ := NewTree(func(first interface{}, sec interface{}) bool {
+
+		if first.(int) < sec.(int) {
+			return true
+		}
+		return false
+	})
+
+	tr.insert(8)
+	tr.delete(8)
+
+	assert.Assert(t, cmp.Nil(tr.rootNode))
+
+	tr.insert(8)
+	tr.insert(8)
+	tr.delete(8)
+	assert.Assert(t, tr.rootNode.value.(int) == 8)
+	tr.delete(8)
+	assert.Assert(t, cmp.Nil(tr.rootNode))
+
+	tr.insert(8)
+	tr.insert(6)
+	tr.insert(15)
+	err := tr.delete(78)
+	assert.Error(t, err, "value not exist in binary tree")
+}
+
+func TestRemoveOneChildNode(t *testing.T) {
+	tr, _ := NewTree(intComparisonFunc)
+
+	tr.insert(8)
+	tr.insert(12)
+	tr.insert(2)
+	tr.insert(3)
+	tr.insert(15)
+	tr.insert(19)
+	tr.insert(1)
+	tr.insert(4)
+	tr.delete(12)
+	tr.delete(3)
+
+	assert.Assert(t, tr.rootNode.right.value.(int) == 15)
+	assert.Assert(t, tr.rootNode.right.right.value.(int) == 19)
+	assert.Assert(t, tr.rootNode.left.right.value.(int) == 4)
+}
+
+func TestRemoveNodeWithChilds(t *testing.T) {
+	/*
+							8
+	                   /         \
+	                  2           12
+	                 / \          / \
+                    1   3        9    15
+	                     \        \     \
+	                      4        11     19
+	*/
+	tr, _ := NewTree(intComparisonFunc)
+
+	tr.insert(8)
+	tr.insert(12)
+	tr.insert(9)
+	tr.insert(15)
+	tr.insert(11)
+	tr.insert(19)
+	tr.insert(2)
+	tr.insert(1)
+	tr.insert(3)
+	tr.insert(4)
+
+	tr.delete(12)
+	tr.delete(2)
+	assert.Assert(t, tr.rootNode.right.value.(int) != 12)
+	assert.Assert(t, tr.rootNode.left.value.(int) != 2)
 }
 
 //func TestNewTreeInterface(t *testing.T) {
@@ -167,3 +269,11 @@ func TestInsertSpecificFunc(t *testing.T) {
 	//})
 	//assert.DeepEqual(t, []int{78, 45, 9, 8, 6, 6, 5}, testedTree.GetAsList())
 //}
+
+func intComparisonFunc(first interface{}, sec interface{}) bool {
+	if first.(int) < sec.(int) {
+		return true
+	}
+	return false
+}
+
