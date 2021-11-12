@@ -8,47 +8,10 @@ import "reflect"
 
 import "gotest.tools/assert"
 
-/*
-Private test for tree
-
-func addLeftChild()  // work only on leaf who has the place to have left child
-func addRightChild() // work only on leaf who has the place to have left child
-
-func removeNode() // work on the specific node
-*/
-
-func TestAddLeftChild(t *testing.T) {
-	node, _ := NewNode(15)
-	err := node.addLeftChild(9)
-	assert.NilError(t, err)
-	err = node.left.addLeftChild(10)
-	assert.NilError(t, err)
-	err = node.addLeftChild(11)
-	assert.Error(t, err, "this node has already left child")
-
-	assert.Assert(t, cmp.Nil(node.right))
-	assert.Assert(t, node.value.(int) == 15)
-	//assert.Assert(t, node.left.value.(int) == 9)
-	//assert.Assert(t, node.left.left.value.(int) == 10)
-}
-
-func TestAddRightChild(t *testing.T) {
-	node, _ := NewNode(15)
-	err := node.addRightChild(9)
-	assert.NilError(t, err)
-	err = node.right.addRightChild(10)
-	assert.NilError(t, err)
-	err = node.addRightChild(11)
-	assert.Error(t, err, "this node has already right child")
-
-	assert.Assert(t, cmp.Nil(node.right))
-	assert.Assert(t, node.value.(int) == 15)
-	assert.Assert(t, node.right.value.(int) == 9)
-	assert.Assert(t, node.right.right.value.(int) == 10)
-}
 
 /*
 Test for public interface
+TODO: Change
 */
 
 func TestNewTreeInterface(t *testing.T) {

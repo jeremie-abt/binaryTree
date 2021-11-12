@@ -1,7 +1,5 @@
 package second_tree
 
-import "errors"
-
 type node struct {
 	parent *node // -> 4
 	left   *node // -> 3
@@ -20,20 +18,6 @@ func newNode(val interface{}) (*node, error) {
 	return &node{
 		value: val,
 	}, nil
-}
-
-func (node *node) addLeftChild (val interface{}) error {
-	var err error = nil
-	if node.left != nil {
-		return errors.New("this node has already left child")
-	}
-	node.left, err = NewNode(val)
-	return err
-}
-
-func (node *node) addRightChild (val interface{}) (error) {
-	node.right.value = val
-	return nil
 }
 
 /*
