@@ -138,17 +138,7 @@ func (nd *node) supprNode() error {
 	if nd.isLeaf() {
 		return nd.cutLeaf()
 	} else if nd.hasOneChild() {
-		// copier le fils
-		var nodeToCopy *node
-		if nd.left != nil {
-			nodeToCopy = nd.left
-		} else {
-			nodeToCopy = nd.right
-		}
-		nd.left = nodeToCopy.left
-		nd.right = nodeToCopy.right
-		nd.value = nodeToCopy.value
-		return err
+		return nd.cutParentOfOneChild()
 	} else {
 		// suppr node with two childs
 		var curNode = nd.right
@@ -163,6 +153,20 @@ func (nd *node) supprNode() error {
 		nd.right = curNode.right
 	}
 	return err
+}
+
+func (nd *node) cutParentOfOneChild() error {
+	var nodeToCopy *node
+
+	if nd.left != nil {
+		nodeToCopy = nd.left
+	} else {
+		nodeToCopy = nd.right
+	}
+	nd.left = nodeToCopy.left
+	nd.right = nodeToCopy.right
+	nd.value = nodeToCopy.value
+	return nil
 }
 
 func (nd *node) cutLeaf() error {
