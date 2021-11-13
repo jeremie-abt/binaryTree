@@ -6,6 +6,26 @@ import (
 	"testing"
 )
 
+func TestNewTree(t *testing.T) {
+	tr, _ := NewTree(intComparisonFunc, 8, 9, 12, 3, 4)
+
+	assert.Assert(t, tr.rootNode.right.value.(int) == 9)
+	assert.Assert(t, tr.rootNode.right.right.value.(int) == 12)
+	assert.Assert(t, tr.rootNode.left.value.(int) == 3)
+	assert.Assert(t, tr.rootNode.left.right.value.(int) == 4)
+
+	_, err := NewTree(intComparisonFunc, 8, 9, 12, 3, "bad data type")
+	assert.Error(t, err, "binary tree can not contain different data type")
+}
+
+func TestGetAsList(t *testing.T) {
+	tr := getBasicIntTree()
+	assert.DeepEqual(t, tr.GetAsList(), []interface{}{1, 2, 3, 4, 8, 12, 15, 19})
+
+	tr, _ = NewTree(intComparisonFunc)
+	assert.Assert(t, cmp.Nil(tr.GetAsList()))
+}
+
 func TestInsertNode(t *testing.T) {
 	tr := getBasicIntTree()
 
@@ -16,6 +36,9 @@ func TestInsertNode(t *testing.T) {
 	assert.Assert(t, tr.rootNode.right.right.value.(int) == 15)
 	assert.Assert(t, tr.rootNode.right.right.right.value.(int) == 19)
 	assert.Assert(t, tr.rootNode.left.left.value.(int) == 1)
+
+	err := tr.Insert("bad data type")
+	assert.Error(t, err, "binary tree can not contain different data type")
 }
 
 func TestInsertSpecificFunc(t *testing.T) {
@@ -33,20 +56,20 @@ func TestInsertSpecificFunc(t *testing.T) {
 func TestDeleteLeaf(t *testing.T) {
 	tr := getBasicIntTree()
 
-	tr.delete(1)
-	tr.delete(4)
-	tr.delete(19)
+	_ = tr.delete(1)
+	_ = tr.delete(4)
+	_ = tr.delete(19)
 	assert.Assert(t, cmp.Nil(tr.rootNode.left.left))
 	assert.Assert(t, cmp.Nil(tr.rootNode.left.right.right))
 	assert.Assert(t, cmp.Nil(tr.rootNode.right.right.right))
 
-	tr.delete(15)
-	tr.delete(3)
+	_ = tr.delete(15)
+	_ = tr.delete(3)
 	assert.Assert(t, cmp.Nil(tr.rootNode.right.right))
 	assert.Assert(t, cmp.Nil(tr.rootNode.left.right))
 
-	tr.delete(12)
-	tr.delete(2)
+	_ = tr.delete(12)
+	_ = tr.delete(2)
 	assert.Assert(t, cmp.Nil(tr.rootNode.right))
 	assert.Assert(t, cmp.Nil(tr.rootNode.left))
 }
@@ -54,21 +77,21 @@ func TestDeleteLeaf(t *testing.T) {
 func TestDeleteRoot(t *testing.T) {
 	tr, _ := NewTree(intComparisonFunc)
 
-	tr.insert(8)
-	tr.delete(8)
+	_ = tr.insert(8)
+	_ = tr.delete(8)
 
 	assert.Assert(t, cmp.Nil(tr.rootNode))
 
-	tr.insert(8)
-	tr.insert(8)
-	tr.delete(8)
+	_ = tr.insert(8)
+	_ = tr.insert(8)
+	_ = tr.delete(8)
 	assert.Assert(t, tr.rootNode.value.(int) == 8)
-	tr.delete(8)
+	_ = tr.delete(8)
 	assert.Assert(t, cmp.Nil(tr.rootNode))
 
-	tr.insert(8)
-	tr.insert(6)
-	tr.insert(15)
+	_ = tr.insert(8)
+	_ = tr.insert(6)
+	_ = tr.insert(15)
 	err := tr.delete(78)
 	assert.Error(t, err, "value not exist in binary tree")
 }
@@ -76,8 +99,8 @@ func TestDeleteRoot(t *testing.T) {
 func TestRemoveOneChildNode(t *testing.T) {
 	tr := getBasicIntTree()
 
-	tr.delete(12)
-	tr.delete(3)
+	_ = tr.delete(12)
+	_ = tr.delete(3)
 
 	assert.Assert(t, tr.rootNode.right.value.(int) == 15)
 	assert.Assert(t, tr.rootNode.right.right.value.(int) == 19)
@@ -85,19 +108,10 @@ func TestRemoveOneChildNode(t *testing.T) {
 }
 
 func TestRemoveNodeWithChilds(t *testing.T) {
-	/*
-									8
-			                   /         \
-			                  2           12
-			                 / \          / \
-		                    1   3        9    15
-			                     \        \     \
-			                      4        11     19
-	*/
 	tr := getBasicIntTree()
 
-	tr.delete(12)
-	tr.delete(2)
+	_ = tr.delete(12)
+	_ = tr.delete(2)
 	assert.Assert(t, tr.rootNode.right.value.(int) != 12)
 	assert.Assert(t, tr.rootNode.left.value.(int) != 2)
 }
@@ -116,7 +130,7 @@ func strComparisonFunc(first interface{}, sec interface{}) bool {
 	return false
 }
 
-func getBasicIntTree() *Tree {
+func getBasicIntTree() *tree {
 	/*
 							8
 						   / \
@@ -128,19 +142,19 @@ func getBasicIntTree() *Tree {
 	*/
 	tr, _ := NewTree(intComparisonFunc)
 
-	tr.insert(8)
-	tr.insert(12)
-	tr.insert(2)
-	tr.insert(3)
-	tr.insert(15)
-	tr.insert(19)
-	tr.insert(1)
-	tr.insert(4)
+	_ = tr.Insert(8)
+	_ = tr.Insert(12)
+	_ = tr.Insert(2)
+	_ = tr.Insert(3)
+	_ = tr.Insert(15)
+	_ = tr.Insert(19)
+	_ = tr.Insert(1)
+	_ = tr.Insert(4)
 
 	return tr
 }
 
-func getBasicStrTree() *Tree {
+func getBasicStrTree() *tree {
 	/*
 			"bonjour"
 			   / \
@@ -152,13 +166,13 @@ func getBasicStrTree() *Tree {
 	*/
 	tr, _ := NewTree(strComparisonFunc)
 
-	tr.insert("bonjour")
-	tr.insert("bonjour a tous")
-	tr.insert("bo")
-	tr.insert("bon")
-	tr.insert("salut a tous les amis")
-	tr.insert("salut salut a tous les ami")
-	tr.insert("s")
+	_ = tr.Insert("bonjour")
+	_ = tr.Insert("bonjour a tous")
+	_ = tr.Insert("bo")
+	_ = tr.Insert("bon")
+	_ = tr.Insert("salut a tous les amis")
+	_ = tr.Insert("salut salut a tous les ami")
+	_ = tr.Insert("s")
 
 	return tr
 }

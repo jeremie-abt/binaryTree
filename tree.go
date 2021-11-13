@@ -5,10 +5,11 @@ import (
 	"reflect"
 )
 
-type Tree struct {
+type tree struct {
 	rootNode *node
 
 	LTFunc func(interface{}, interface{}) bool
+	typeOf reflect.Type
 }
 
 type node struct {
@@ -19,25 +20,19 @@ type node struct {
 	value interface{}
 }
 
-func NewTree(LTFunc func(interface{}, interface{}) bool, val ...interface{}) (*Tree, error) {
-
-	// TODO: COde and refactor
+func NewTree(LTFunc func(interface{}, interface{}) bool, vals ...interface{}) (*tree, error) {
 	var err error = nil
 
-	if len(val) == 0 {
-		return &Tree{
-			rootNode: nil,
-			LTFunc:   LTFunc,
-		}, err
+	tr := &tree{
+		LTFunc: LTFunc,
 	}
-	if len(val) != 1 {
-		panic("not implemented yet")
+	for _, val := range vals {
+		err = tr.Insert(val)
+		if err != nil {
+			break
+		}
 	}
-	node, err := newNode(val[0], nil)
-	return &Tree{
-		rootNode: node,
-		LTFunc:   LTFunc,
-	}, err
+	return tr, err
 }
 
 func newNode(val interface{}, parent *node) (*node, error) {
@@ -52,22 +47,56 @@ func getRootNode() (*node, error) {
 	return newNode(nil, nil)
 }
 
-func (tr *Tree) Insert(vals ...interface{}) error {
+func (tr *tree) Insert(val interface{}) error {
+	if tr.typeOf == nil {
+		tr.typeOf = reflect.TypeOf(val)
+	}
+	if reflect.TypeOf(val) != tr.typeOf {
+		return errors.New("binary tree can not contain different data type")
+	}
+	return tr.insert(val)
+}
+
+func (tr *tree) Delete(vals ...interface{}) error {
 	return nil
 }
 
-func (tr *Tree) Delete(vals ...interface{}) error {
-	return nil
+func generateInorderTraversal(tr *tree) <-chan interface{} {
+	ch := make(chan interface{})
+
+	go func() {
+		defer close(ch)
+
+		var stack = make([]*node, 0)
+		var popedVal *node
+
+		cur := tr.rootNode
+		for len(stack) > 0 || cur != nil {
+			if cur != nil {
+				stack = append(stack, cur)
+				cur = cur.left
+			} else {
+				stack, popedVal = stack[:len(stack)-1], stack[len(stack)-1] // Pop
+				ch <- popedVal.value
+				cur = popedVal.right
+			}
+		}
+	}()
+	return ch
 }
 
-func (tr *Tree) GetAsList() []interface{} {
-	return nil
+func (tr *tree) GetAsList() []interface{} {
+	var rs []interface{}
+	consumer := generateInorderTraversal(tr)
+	for val := range consumer {
+		rs = append(rs, val)
+	}
+	return rs
 }
 
-func (tr *Tree) AddTriFunc(func(interface{}, interface{}) int) {}
+func (tr *tree) AddTriFunc(func(interface{}, interface{}) int) {}
 
-func (tr *Tree) insert(val interface{}) error {
-	// TODO: relire ce code pour voir s'il reste clair
+func (tr *tree) insert(val interface{}) error {
 	var err error = nil
 	var ChildToLookFor **node
 	nd := tr.rootNode
@@ -92,7 +121,7 @@ func (tr *Tree) insert(val interface{}) error {
 	return err
 }
 
-func (tr *Tree) delete(val interface{}) error {
+func (tr *tree) delete(val interface{}) error {
 	var childToLookFor *node
 
 	curNode := tr.rootNode
@@ -112,7 +141,7 @@ func (tr *Tree) delete(val interface{}) error {
 	}
 }
 
-func (tr *Tree) shouldGoLeft(nd *node, val interface{}) bool {
+func (tr *tree) shouldGoLeft(nd *node, val interface{}) bool {
 
 	LessThanFunc := tr.LTFunc
 	if LessThanFunc(val, nd.value) {
@@ -121,7 +150,7 @@ func (tr *Tree) shouldGoLeft(nd *node, val interface{}) bool {
 	return false
 }
 
-func (tr *Tree) tryToDeleteRootNode(val interface{}) error {
+func (tr *tree) tryToDeleteRootNode(val interface{}) error {
 	var err error = nil
 
 	if reflect.DeepEqual(val, tr.rootNode.value) {
@@ -133,8 +162,6 @@ func (tr *Tree) tryToDeleteRootNode(val interface{}) error {
 }
 
 func (nd *node) supprNode() error {
-	var err error = nil
-
 	if nd.isLeaf() {
 		return nd.cutLeaf()
 	} else if nd.hasOneChild() {
@@ -142,7 +169,6 @@ func (nd *node) supprNode() error {
 	} else {
 		return nd.cutParentWithChilds()
 	}
-	return err
 }
 
 func (nd *node) cutParentWithChilds() error {
@@ -182,7 +208,7 @@ func (nd *node) cutLeaf() error {
 	return nil
 }
 
-func (tr *Tree) InstanciateRootNode(val interface{}) error {
+func (tr *tree) InstanciateRootNode(val interface{}) error {
 	var err error = nil
 	tr.rootNode, err = getRootNode()
 	tr.rootNode.value = val
