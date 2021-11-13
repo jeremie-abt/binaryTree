@@ -136,7 +136,6 @@ func (nd *node) supprNode() error {
 	var err error = nil
 
 	if nd.isLeaf() {
-		// cut the leaf
 		return nd.cutLeaf()
 	} else if nd.hasOneChild() {
 		// copier le fils
