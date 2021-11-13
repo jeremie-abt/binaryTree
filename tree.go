@@ -1,4 +1,4 @@
-package second_tree
+package tree
 
 import (
 	"errors"

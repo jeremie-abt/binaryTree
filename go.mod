@@ -1,4 +1,4 @@
-module github.com/jeremie-abt/second_tree
+module github.com/jeremie-abt/tree
 
 go 1.16
 
