@@ -112,6 +112,15 @@ func (tr *Tree) delete(val interface{}) error {
 	}
 }
 
+func (tr *Tree) shouldGoLeft(nd *node, val interface{}) bool {
+
+	LessThanFunc := tr.LTFunc
+	if LessThanFunc(val, nd.value) {
+		return true
+	}
+	return false
+}
+
 func (tr *Tree) tryToDeleteRootNode(val interface{}) error {
 	var err error = nil
 
@@ -123,25 +132,12 @@ func (tr *Tree) tryToDeleteRootNode(val interface{}) error {
 	return err
 }
 
-func (tr *Tree) shouldGoLeft(nd *node, val interface{}) bool {
-
-	LessThanFunc := tr.LTFunc
-	if LessThanFunc(val, nd.value) {
-		return true
-	}
-	return false
-}
-
 func (nd *node) supprNode() error {
 	var err error = nil
 
 	if nd.isLeaf() {
 		// cut the leaf
-		if nd.parent.left == nd {
-			nd.parent.left = nil
-		} else {
-			nd.parent.right = nil
-		}
+		return nd.cutLeaf()
 	} else if nd.hasOneChild() {
 		// copier le fils
 		var nodeToCopy *node
@@ -168,6 +164,15 @@ func (nd *node) supprNode() error {
 		nd.right = curNode.right
 	}
 	return err
+}
+
+func (nd *node) cutLeaf() error {
+	if nd.parent.left == nd {
+		nd.parent.left = nil
+	} else {
+		nd.parent.right = nil
+	}
+	return nil
 }
 
 func (tr *Tree) InstanciateRootNode(val interface{}) error {
