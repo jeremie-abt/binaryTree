@@ -140,19 +140,23 @@ func (nd *node) supprNode() error {
 	} else if nd.hasOneChild() {
 		return nd.cutParentOfOneChild()
 	} else {
-		// suppr node with two childs
-		var curNode = nd.right
-		for {
-			if curNode.left == nil {
-				break
-			}
-			curNode = curNode.left
-		}
-		// curNode est le node a replace
-		nd.value = curNode.value
-		nd.right = curNode.right
+		return nd.cutParentWithChilds()
 	}
 	return err
+}
+
+func (nd *node) cutParentWithChilds() error {
+	var curNode = nd.right
+	for {
+		// get next inorder traversal node
+		if curNode.left == nil {
+			break
+		}
+		curNode = curNode.left
+	}
+	nd.value = curNode.value
+	nd.right = curNode.right
+	return nil
 }
 
 func (nd *node) cutParentOfOneChild() error {
