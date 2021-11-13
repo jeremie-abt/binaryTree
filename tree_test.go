@@ -18,7 +18,6 @@ func TestInsertNode(t *testing.T) {
 	assert.Assert(t, tr.rootNode.left.left.value.(int) == 1)
 }
 
-
 func TestInsertSpecificFunc(t *testing.T) {
 	tr := getBasicStrTree()
 
@@ -52,7 +51,7 @@ func TestDeleteLeaf(t *testing.T) {
 	assert.Assert(t, cmp.Nil(tr.rootNode.left))
 }
 
-func TestDeleteRoot(t *testing.T){
+func TestDeleteRoot(t *testing.T) {
 	tr, _ := NewTree(intComparisonFunc)
 
 	tr.insert(8)
@@ -87,13 +86,13 @@ func TestRemoveOneChildNode(t *testing.T) {
 
 func TestRemoveNodeWithChilds(t *testing.T) {
 	/*
-							8
-	                   /         \
-	                  2           12
-	                 / \          / \
-                    1   3        9    15
-	                     \        \     \
-	                      4        11     19
+									8
+			                   /         \
+			                  2           12
+			                 / \          / \
+		                    1   3        9    15
+			                     \        \     \
+			                      4        11     19
 	*/
 	tr := getBasicIntTree()
 
