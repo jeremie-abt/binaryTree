@@ -57,8 +57,14 @@ func (tr *tree) Insert(val interface{}) error {
 	return tr.insert(val)
 }
 
-func (tr *tree) Delete(vals ...interface{}) error {
-	return nil
+func (tr *tree) Delete(val interface{}) error {
+	if tr.typeOf == nil {
+		tr.typeOf = reflect.TypeOf(val)
+	}
+	if reflect.TypeOf(val) != tr.typeOf {
+		return errors.New("binary tree can not contain different data type")
+	}
+	return tr.delete(val)
 }
 
 func generateInorderTraversal(tr *tree) <-chan interface{} {
@@ -93,8 +99,6 @@ func (tr *tree) GetAsSlice() []interface{} {
 	}
 	return rs
 }
-
-func (tr *tree) AddTriFunc(func(interface{}, interface{}) int) {}
 
 func (tr *tree) insert(val interface{}) error {
 	var err error = nil

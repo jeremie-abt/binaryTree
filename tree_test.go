@@ -53,23 +53,24 @@ func TestInsertSpecificFunc(t *testing.T) {
 	assert.Assert(t, tr.rootNode.left.left.value.(string) == "s")
 }
 
+// TODO: refacto delete tests
 func TestDeleteLeaf(t *testing.T) {
 	tr := getBasicIntTree()
 
-	_ = tr.delete(1)
-	_ = tr.delete(4)
-	_ = tr.delete(19)
+	_ = tr.Delete(1)
+	_ = tr.Delete(4)
+	_ = tr.Delete(19)
 	assert.Assert(t, cmp.Nil(tr.rootNode.left.left))
 	assert.Assert(t, cmp.Nil(tr.rootNode.left.right.right))
 	assert.Assert(t, cmp.Nil(tr.rootNode.right.right.right))
 
-	_ = tr.delete(15)
-	_ = tr.delete(3)
+	_ = tr.Delete(15)
+	_ = tr.Delete(3)
 	assert.Assert(t, cmp.Nil(tr.rootNode.right.right))
 	assert.Assert(t, cmp.Nil(tr.rootNode.left.right))
 
-	_ = tr.delete(12)
-	_ = tr.delete(2)
+	_ = tr.Delete(12)
+	_ = tr.Delete(2)
 	assert.Assert(t, cmp.Nil(tr.rootNode.right))
 	assert.Assert(t, cmp.Nil(tr.rootNode.left))
 }
@@ -78,29 +79,31 @@ func TestDeleteRoot(t *testing.T) {
 	tr, _ := NewTree(intComparisonFunc)
 
 	_ = tr.Insert(8)
-	_ = tr.delete(8)
+	_ = tr.Delete(8)
 
 	assert.Assert(t, cmp.Nil(tr.rootNode))
 
 	_ = tr.Insert(8)
 	_ = tr.Insert(8)
-	_ = tr.delete(8)
+	_ = tr.Delete(8)
 	assert.Assert(t, tr.rootNode.value.(int) == 8)
-	_ = tr.delete(8)
+	_ = tr.Delete(8)
 	assert.Assert(t, cmp.Nil(tr.rootNode))
 
 	_ = tr.Insert(8)
 	_ = tr.Insert(6)
 	_ = tr.Insert(15)
-	err := tr.delete(78)
+	err := tr.Delete(78)
 	assert.Error(t, err, "value not exist in binary tree")
+	err = tr.Delete("bad data type")
+	assert.Error(t, err, "binary tree can not contain different data type")
 }
 
 func TestRemoveOneChildNode(t *testing.T) {
 	tr := getBasicIntTree()
 
-	_ = tr.delete(12)
-	_ = tr.delete(3)
+	_ = tr.Delete(12)
+	_ = tr.Delete(3)
 
 	assert.Assert(t, tr.rootNode.right.value.(int) == 15)
 	assert.Assert(t, tr.rootNode.right.right.value.(int) == 19)
@@ -110,8 +113,8 @@ func TestRemoveOneChildNode(t *testing.T) {
 func TestRemoveNodeWithChilds(t *testing.T) {
 	tr := getBasicIntTree()
 
-	_ = tr.delete(12)
-	_ = tr.delete(2)
+	_ = tr.Delete(12)
+	_ = tr.Delete(2)
 	assert.Assert(t, tr.rootNode.right.value.(int) != 12)
 	assert.Assert(t, tr.rootNode.left.value.(int) != 2)
 }
