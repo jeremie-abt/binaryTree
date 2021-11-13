@@ -85,7 +85,7 @@ func generateInorderTraversal(tr *tree) <-chan interface{} {
 	return ch
 }
 
-func (tr *tree) GetAsList() []interface{} {
+func (tr *tree) GetAsSlice() []interface{} {
 	var rs []interface{}
 	consumer := generateInorderTraversal(tr)
 	for val := range consumer {

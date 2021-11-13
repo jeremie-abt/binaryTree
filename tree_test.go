@@ -18,12 +18,12 @@ func TestNewTree(t *testing.T) {
 	assert.Error(t, err, "binary tree can not contain different data type")
 }
 
-func TestGetAsList(t *testing.T) {
+func TestGetAsSlice(t *testing.T) {
 	tr := getBasicIntTree()
-	assert.DeepEqual(t, tr.GetAsList(), []interface{}{1, 2, 3, 4, 8, 12, 15, 19})
+	assert.DeepEqual(t, tr.GetAsSlice(), []interface{}{1, 2, 3, 4, 8, 12, 15, 19})
 
 	tr, _ = NewTree(intComparisonFunc)
-	assert.Assert(t, cmp.Nil(tr.GetAsList()))
+	assert.Assert(t, cmp.Nil(tr.GetAsSlice()))
 }
 
 func TestInsertNode(t *testing.T) {
