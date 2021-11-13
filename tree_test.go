@@ -77,21 +77,21 @@ func TestDeleteLeaf(t *testing.T) {
 func TestDeleteRoot(t *testing.T) {
 	tr, _ := NewTree(intComparisonFunc)
 
-	_ = tr.insert(8)
+	_ = tr.Insert(8)
 	_ = tr.delete(8)
 
 	assert.Assert(t, cmp.Nil(tr.rootNode))
 
-	_ = tr.insert(8)
-	_ = tr.insert(8)
+	_ = tr.Insert(8)
+	_ = tr.Insert(8)
 	_ = tr.delete(8)
 	assert.Assert(t, tr.rootNode.value.(int) == 8)
 	_ = tr.delete(8)
 	assert.Assert(t, cmp.Nil(tr.rootNode))
 
-	_ = tr.insert(8)
-	_ = tr.insert(6)
-	_ = tr.insert(15)
+	_ = tr.Insert(8)
+	_ = tr.Insert(6)
+	_ = tr.Insert(15)
 	err := tr.delete(78)
 	assert.Error(t, err, "value not exist in binary tree")
 }
