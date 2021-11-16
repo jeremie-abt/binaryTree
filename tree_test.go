@@ -7,14 +7,14 @@ import (
 )
 
 func TestNewTree(t *testing.T) {
-	tr, _ := NewTree(intComparisonFunc, 8, 9, 12, 3, 4)
+	tr, _ := NewTree(IncreasingIntCmpFc, 8, 9, 12, 3, 4)
 
 	assert.Assert(t, tr.rootNode.right.value.(int) == 9)
 	assert.Assert(t, tr.rootNode.right.right.value.(int) == 12)
 	assert.Assert(t, tr.rootNode.left.value.(int) == 3)
 	assert.Assert(t, tr.rootNode.left.right.value.(int) == 4)
 
-	_, err := NewTree(intComparisonFunc, 8, 9, 12, 3, "bad data type")
+	_, err := NewTree(IncreasingIntCmpFc, 8, 9, 12, 3, "bad data type")
 	assert.Error(t, err, "binary tree can not contain different data type")
 }
 
@@ -22,7 +22,7 @@ func TestGetAsSlice(t *testing.T) {
 	tr := getBasicIntTree()
 	assert.DeepEqual(t, tr.GetAsSlice(), []interface{}{1, 2, 3, 4, 8, 12, 15, 19})
 
-	tr, _ = NewTree(intComparisonFunc)
+	tr, _ = NewTree(IncreasingIntCmpFc)
 	assert.Assert(t, cmp.Nil(tr.GetAsSlice()))
 }
 
@@ -76,7 +76,7 @@ func TestDeleteLeaf(t *testing.T) {
 }
 
 func TestDeleteRoot(t *testing.T) {
-	tr, _ := NewTree(intComparisonFunc)
+	tr, _ := NewTree(IncreasingIntCmpFc)
 
 	_ = tr.Insert(8)
 	_ = tr.Delete(8)
@@ -119,20 +119,6 @@ func TestRemoveNodeWithChilds(t *testing.T) {
 	assert.Assert(t, tr.rootNode.left.value.(int) != 2)
 }
 
-func intComparisonFunc(first interface{}, sec interface{}) bool {
-	if first.(int) < sec.(int) {
-		return true
-	}
-	return false
-}
-
-func strComparisonFunc(first interface{}, sec interface{}) bool {
-	if len(first.(string)) < len(sec.(string)) {
-		return true
-	}
-	return false
-}
-
 func getBasicIntTree() *tree {
 	/*
 							8
@@ -143,7 +129,7 @@ func getBasicIntTree() *tree {
 		                     \     \
 		                      4     19
 	*/
-	tr, _ := NewTree(intComparisonFunc)
+	tr, _ := NewTree(IncreasingIntCmpFc)
 
 	_ = tr.Insert(8)
 	_ = tr.Insert(12)
@@ -167,7 +153,7 @@ func getBasicStrTree() *tree {
 										 \
 										  "salut salut a tous les amis"
 	*/
-	tr, _ := NewTree(strComparisonFunc)
+	tr, _ := NewTree(IncreasingStringCmpFc)
 
 	_ = tr.Insert("bonjour")
 	_ = tr.Insert("bonjour a tous")

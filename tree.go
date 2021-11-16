@@ -8,8 +8,8 @@ import (
 type tree struct {
 	rootNode *node
 
-	LTFunc func(interface{}, interface{}) bool
-	typeOf reflect.Type
+	comparisonFc TwoNodesComparisonFunc
+	typeOf       reflect.Type
 }
 
 type node struct {
@@ -20,11 +20,13 @@ type node struct {
 	value interface{}
 }
 
-func NewTree(LTFunc func(interface{}, interface{}) bool, vals ...interface{}) (*tree, error) {
+type TwoNodesComparisonFunc func(interface{}, interface{}) bool
+
+func NewTree(comparisonFc TwoNodesComparisonFunc, vals ...interface{}) (*tree, error) {
 	var err error = nil
 
 	tr := &tree{
-		LTFunc: LTFunc,
+		comparisonFc: comparisonFc,
 	}
 	for _, val := range vals {
 		err = tr.Insert(val)
@@ -106,7 +108,7 @@ func (tr *tree) insert(val interface{}) error {
 	nd := tr.rootNode
 
 	if nd == nil {
-		return tr.InstanciateRootNode(val)
+		return tr.instanciateRootNode(val)
 	}
 
 	currentNode := tr.rootNode
@@ -147,7 +149,7 @@ func (tr *tree) delete(val interface{}) error {
 
 func (tr *tree) shouldGoLeft(nd *node, val interface{}) bool {
 
-	LessThanFunc := tr.LTFunc
+	LessThanFunc := tr.comparisonFc
 	if LessThanFunc(val, nd.value) {
 		return true
 	}
@@ -212,7 +214,7 @@ func (nd *node) cutLeaf() error {
 	return nil
 }
 
-func (tr *tree) InstanciateRootNode(val interface{}) error {
+func (tr *tree) instanciateRootNode(val interface{}) error {
 	var err error = nil
 	tr.rootNode, err = getRootNode()
 	tr.rootNode.value = val
@@ -221,6 +223,20 @@ func (tr *tree) InstanciateRootNode(val interface{}) error {
 
 func (nd *node) isLeaf() bool {
 	if nd.left == nil && nd.right == nil {
+		return true
+	}
+	return false
+}
+
+func IncreasingIntCmpFc(first interface{}, sec interface{}) bool {
+	if first.(int) < sec.(int) {
+		return true
+	}
+	return false
+}
+
+func IncreasingStringCmpFc(first interface{}, sec interface{}) bool {
+	if len(first.(string)) < len(sec.(string)) {
 		return true
 	}
 	return false
